@@ -1,7 +1,7 @@
 solr-thai-test
 ==============
 
-Basic test setup for using Thai language in Solr.
+Basic test setup for using Thai language in Solr. Part of the [Introduction to Solr](http://www.slideshare.net/arafalov/introduction-to-solr-from-bangkok-meetup) presentation at Bangkok meetup.
 
 Remember the change the library path in *solrconfig.xml*
 
