@@ -9,4 +9,4 @@ Notice that the magic English/Thai/Translit search is done against **/thai** sea
 
 Also, in *schema.xml* there is a couple of unused field types to show possible alternative approach to tokenize Thai text.
 
-The data (to import using *import.sh*) was scraped from [Wikipedia](http://en.wikipedia.org/wiki/List_of_Thai_dishes).
+The data to import (using *import.sh*) was scraped from [Wikipedia](http://en.wikipedia.org/wiki/List_of_Thai_dishes).
