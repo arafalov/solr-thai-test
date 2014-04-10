@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema version="1.5">
+    <fields>
+        <field name="id" type="string" indexed="true" stored="true" required="true"/>
+
+        <field name="thai_name" type="thai" indexed="true" stored="true" required="true"/>
+        <field name="thai_auto_translit" type="thai_english" indexed="true" stored="false" />
+        <copyField source="thai_name" dest="thai_auto_translit" />
+
+        <field name="thai_translit" type="english" indexed="true" stored="true" />
+
+        <field name="english_name" type="english" indexed="true" stored="true" />
+
+        <field name="image" type="string" indexed="true" stored="true" />
+        <field name="region" type="string" indexed="true" stored="true" />
+        <field name="description" type="string" indexed="true" stored="true" />
+
+    </fields>
+    <uniqueKey>id</uniqueKey>
+    <types>
+        <fieldType name="string" class="solr.StrField" />
+
+        <fieldType name="english" class="solr.TextField" >
+            <analyzer>
+                <tokenizer class="solr.StandardTokenizerFactory" />
+                <filter class="solr.LowerCaseFilterFactory" />
+            </analyzer>
+        </fieldType>
+
+        <fieldType name="thai" class="solr.TextField" >
+            <analyzer class="org.apache.lucene.analysis.th.ThaiAnalyzer"/>
+        </fieldType>
+
+        <!--
+            During indexing:
+            1) tokenize Thai text with built-in rules+dictionary
+            2) map it to latin characters (with special accents indicating tones
+            3) get ride of tone marks, as nobody uses them
+            4) do some phonetic (BMF) broadening to match possible alternative spellings in English
+
+            During querying, we don't want this field type matching Thai text on query (BMFF is a little too aggresive for that). So, we are doing English-specific query chain
+        -->
+        <fieldType name="thai_english" class="solr.TextField">
+            <analyzer type="index">
+                <tokenizer class="solr.ICUTokenizerFactory"/>
+                <filter class="solr.ICUTransformFilterFactory" id="Thai-Latin" />
+                <filter class="solr.ICUTransformFilterFactory" id="NFD; [:Nonspacing Mark:] Remove; NFC" />
+                <filter class="solr.BeiderMorseFilterFactory" />
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.StandardTokenizerFactory" />
+                <filter class="solr.LowerCaseFilterFactory" />
+                <filter class="solr.BeiderMorseFilterFactory" />
+            </analyzer>
+        </fieldType>
+
+
+        <!-- Not used but show a couple of other ways to deal with Thai -->
+
+        <fieldType name="thai_test1" class="solr.TextField" >
+            <analyzer>
+                <tokenizer class="solr.StandardTokenizerFactory"/>
+                <filter class="solr.ThaiWordFilterFactory"/>
+            </analyzer>
+        </fieldType>
+
+        <fieldType name="thai_en1" class="solr.TextField" >
+            <analyzer>
+                <tokenizer class="solr.StandardTokenizerFactory"/>
+                <filter class="solr.ThaiWordFilterFactory"/>
+                <filter class="solr.ICUTransformFilterFactory" id="Thai-Latin" />
+                <filter class="solr.ICUTransformFilterFactory" id="NFD; [:Nonspacing Mark:] Remove; NFC" />
+            </analyzer>
+        </fieldType>
+
+    </types>
+</schema>
+
